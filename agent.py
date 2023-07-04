@@ -26,7 +26,8 @@ class Agent:
         self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
-        self.resume_or_not()
+        # TODO: create arguments
+        # self.resume_or_not()
         
     def resume_or_not(self):
         model_folder_path = "./best_model"
