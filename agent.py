@@ -99,7 +99,7 @@ class Agent:
             batch = self.memory
 
         states, actions, rewards, next_states, game_overs = zip(*batch)
-        self.trainer.train_step(states, actions, rewards, next_states, game_overs)
+        self.trainer.train_step(np.array(states), np.array(actions), np.array(rewards), np.array(next_states), np.array(game_overs))
     
     def train_short_memory(self, state, action, reward, next_state, game_over):
         self.trainer.train_step(state, action, reward, next_state, game_over)
