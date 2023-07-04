@@ -4,6 +4,7 @@ import numpy as np
 from snake_game_ai import SnakeGameAI, Direction, Point
 from collections import deque
 from model import Linear_QNet, QTrainer
+import os
 
 # Constants
 MAX_MEMORY = 100_000
@@ -24,7 +25,13 @@ class Agent:
         # Set model and trainer
         self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
+
+        self.resume_or_not()
         
+    def resume_or_not(self):
+        model_folder_path = "./best_model"
+        if os.path.exists(model_folder_path):
+            self.model.load_state_dict(torch.load(os.path.join(model_folder_path, "model.pth")))
 
     def get_state(self, game):
         """
