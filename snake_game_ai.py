@@ -85,7 +85,7 @@ class SnakeGameAI:
         reward = 0
         game_over = False
         # check if collided or if the snake doesn't do anything for too long (longer the snake, more time the app has)
-        if self._is_collision() or self.frame_iteration > 100*len(self.snake):
+        if self.is_collision() or self.frame_iteration > 100*len(self.snake):
             game_over = True
             reward = -10
             return reward, game_over, self.score
@@ -104,7 +104,7 @@ class SnakeGameAI:
         # 6. return game over and score
         return reward, game_over, self.score
     
-    def _is_collision(self, point=None):
+    def is_collision(self, point=None):
         """
             Check for collision. if 'point' is None it just checks if head collided, 
             otherwise we can use it to know if danger is nearby passing a point different from the head.
@@ -113,7 +113,7 @@ class SnakeGameAI:
             point = self.head
 
         # hits boundary
-        if point.head.x > self.w - BLOCK_SIZE or point.x < 0 or point.y > self.h - BLOCK_SIZE or point.y < 0:
+        if point.x > self.w - BLOCK_SIZE or point.x < 0 or point.y > self.h - BLOCK_SIZE or point.y < 0:
             return True
         # hits itself
         if point in self.snake[1:]:
@@ -144,14 +144,14 @@ class SnakeGameAI:
 
         clock_wise = [Direction.RIGHT, Direction.DOWN, Direction.LEFT, Direction.UP]
         direction_index = clock_wise.index(self.direction)
-
+        
         if np.array_equal(action, [1, 0, 0]):
             new_direction = clock_wise[direction_index]
         elif np.array_equal(action, [0, 1, 0]):
-            next_direction_index = (new_direction + 1) % 4 # mod 4 used for start again from 0 after 3
+            next_direction_index = (direction_index + 1) % 4 # mod 4 used for start again from 0 after 3
             new_direction = clock_wise[next_direction_index] # r -> d -> l -> u -> r ..
         else:
-            next_direction_index = (new_direction - 1) % 4 
+            next_direction_index = (direction_index - 1) % 4 
             new_direction = clock_wise[next_direction_index] # r -> u -> l -> d -> r ..
 
         self.direction = new_direction
