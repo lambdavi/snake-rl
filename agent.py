@@ -1,10 +1,13 @@
-import torch
-import random
-import numpy as np
-from snake_game_ai import SnakeGameAI, Direction, Point
-from collections import deque
-from model import Linear_QNet, QTrainer
 import os
+import random
+from collections import deque
+
+import numpy as np
+import torch
+
+from helper import plot
+from model import Linear_QNet, QTrainer
+from snake_game_ai import Direction, Point, SnakeGameAI
 
 # Constants
 MAX_MEMORY = 100_000
@@ -166,7 +169,11 @@ def train():
 
             print(f"--- Game: {agent.n_games} - Score: {score} - Record: {record} ---")
 
-            # TODO: plotting
+            plot_scores.append(score)
+            total_score += score
+            mean_score = total_score / agent.n_games
+            plot_mean_scores.append(mean_score)
+            plot(plot_scores, plot_mean_scores)
 
 
 if __name__ == "__main__":
