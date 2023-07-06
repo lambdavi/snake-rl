@@ -5,14 +5,16 @@ import torch.nn.functional as F
 import os
 
 class Linear_QNet(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size) -> None:
+    def __init__(self, input_size, hidden_size, hidden_size2, output_size) -> None:
         super().__init__()
         self.linear1 = nn.Linear(input_size, hidden_size)
-        self.linear2 = nn.Linear(hidden_size, output_size)
+        self.linear2 = nn.Linear(hidden_size, hidden_size2)
+        self.linear3 = nn.Linear(hidden_size2, output_size)
 
     def forward(self, x):
         x = F.relu(self.linear1(x))
         x = self.linear2(x)
+        x = self.linear3(x)
         return x
     
     def save(self, file_name='model.pth'):
@@ -30,6 +32,7 @@ class QTrainer:
         self.gamma = gamma
         self.model = model
         self.optimizer = optim.Adam(model.parameters(), lr=self.lr)
+        #self.optimizer = optim.SGD(model.parameters(), lr=self.lr)
         self.criterion = nn.MSELoss()
 
     def train_step(self, state, action, reward, next_state, game_over):

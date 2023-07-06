@@ -25,7 +25,7 @@ class Agent:
         self.memory = deque(maxlen=MAX_MEMORY)
         
         # Set model and trainer
-        self.model = Linear_QNet(11, 256, 3)
+        self.model = Linear_QNet(11, 256, 128, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -42,13 +42,46 @@ class Agent:
         point_r = Point(head.x + 20, head.y)
         point_u = Point(head.x, head.y - 20)
         point_d = Point(head.x, head.y + 20)
+        point_ru = Point(head.x+ 20, head.y - 20)
+        point_lu = Point(head.x - 20, head.y - 20)
+        point_ld = Point(head.x - 20, head.y + 20)
+        point_rd = Point(head.x + 20, head.y + 20)
+
 
         # Get the direction we are moving towards (one-hot encoding like)
         dir_l = game.direction == Direction.LEFT
         dir_r = game.direction == Direction.RIGHT
         dir_u = game.direction == Direction.UP
         dir_d = game.direction == Direction.DOWN
+        """# Danger diagonal straight
+            (dir_r and (game.is_collision(point_ru) or dir_r and game.is_collision(point_rd))) or
+            (dir_l and (game.is_collision(point_lu) or dir_l and game.is_collision(point_ld))),
 
+            # Danger diagonal left
+            (dir_l and (game.is_collision(point_ld) or game.is_collision(point_rd))) or
+            (dir_r and (game.is_collision(point_lu) or game.is_collision(point_ru))),
+
+            # Danger diagonal right
+            (dir_r and (game.is_collision(point_rd) or game.is_collision(point_ld))) or
+            (dir_l and (game.is_collision(point_ru) or game.is_collision(point_lu))),"""
+        """
+        (dir_r and (game.is_collision(point_r) or game.is_collision(point_ru) or game.is_collision(point_rd))) or
+            (dir_l and (game.is_collision(point_l) or game.is_collision(point_lu) or game.is_collision(point_ld))) or
+            (dir_u and (game.is_collision(point_u) or game.is_collision(point_ru) or game.is_collision(point_lu))) or
+            (dir_d and (game.is_collision(point_d) or game.is_collision(point_ld) or game.is_collision(point_rd))),
+
+            # Danger right
+            (dir_u and (game.is_collision(point_r) or game.is_collision(point_ru) or game.is_collision(point_rd))) or
+            (dir_r and (game.is_collision(point_d) or game.is_collision(point_rd) or game.is_collision(point_ld))) or
+            (dir_l and (game.is_collision(point_u) or game.is_collision(point_ru) or game.is_collision(point_lu))) or
+            (dir_d and (game.is_collision(point_l) or game.is_collision(point_lu) or game.is_collision(point_ld))),
+
+            # Danger left
+            (dir_l and (game.is_collision(point_d) or game.is_collision(point_ld) or game.is_collision(point_rd))) or
+            (dir_r and (game.is_collision(point_u) or game.is_collision(point_lu) or game.is_collision(point_ru))) or
+            (dir_u and (game.is_collision(point_l) or game.is_collision(point_lu) or game.is_collision(point_ld))) or
+            (dir_d and (game.is_collision(point_r) or game.is_collision(point_ru) or game.is_collision(point_rd))),
+        """
         state = [
             # Danger straight
             (dir_r and game.is_collision(point_r)) or

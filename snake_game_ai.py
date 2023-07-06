@@ -1,5 +1,5 @@
 import random
-from collections import namedtuple
+from collections import namedtuple, deque
 from enum import Enum
 
 import numpy as np
@@ -7,6 +7,7 @@ import pygame
 
 pygame.init()
 font = pygame.font.Font('arial.ttf', 25)
+
 class Direction(Enum):
     RIGHT = 1
     LEFT = 2
@@ -21,9 +22,10 @@ RED = (200,0,0)
 BLUE1 = (0, 0, 255)
 BLUE2 = (0, 100, 255)
 BLACK = (0,0,0)
+GREEN = (0, 153, 0)
 
 BLOCK_SIZE = 20
-SPEED = 50
+SPEED = 60
 
 class SnakeGameAI:
     """
@@ -37,7 +39,7 @@ class SnakeGameAI:
         self.display = pygame.display.set_mode((self.w, self.h))
         pygame.display.set_caption('Snake')
         self.clock = pygame.time.Clock()
-        
+        self.cycle = deque(maxlen=20)
         self.reset()
         
 
@@ -66,10 +68,30 @@ class SnakeGameAI:
         if self.food in self.snake:
             self._place_food()
         
+    def distance_from_food(self):
+        dist = ((self.head.x - self.food.x)**2 + (self.head.y - self.food.y)**2)**(0.5)
+        return dist
+    
+    def check_for_cycles(self):
+        moves = dict()
+        for move in self.cycle:
+            if moves.get(move):
+                moves[move] += 1
+            else:
+                moves[move] = 1
+        
+        for v in moves.values():
+            if v >= 5:
+                print("cycle detected")
+                self.cycle.clear()
+                return True
+        return False
+    
     def play_step(self, action):
         # 0. update the time step
         self.frame_iteration += 1
 
+        initial_distance = self.distance_from_food()
         # 1. collect user input only to check if we want to stop the game
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -79,7 +101,10 @@ class SnakeGameAI:
         # 2. move: update the head of the snake
         self._move(action)
         self.snake.insert(0, self.head)
-        
+        final_distance = self.distance_from_food()
+
+        self.cycle.append(self.head)
+
         # 3. check if game over
         # set reward to return to the agent
         reward = 0
@@ -97,12 +122,21 @@ class SnakeGameAI:
             self._place_food()
         else:
             self.snake.pop()
+
+            if final_distance < initial_distance:
+                reward += 0.1
+            else:
+                reward += -0.1
+
+            if self.check_for_cycles():
+                reward -= 2
         
         # 5. update ui and clock
         self._update_ui()
         self.clock.tick(SPEED)
         # 6. return game over and score
         return reward, game_over, self.score
+    
     
     def is_collision(self, point=None):
         """
@@ -124,7 +158,11 @@ class SnakeGameAI:
     def _update_ui(self):
         self.display.fill(BLACK)
         
-        for pt in self.snake:
+        pt = self.head
+        pygame.draw.rect(self.display, GREEN, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
+        pygame.draw.rect(self.display, GREEN, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
+            
+        for pt in self.snake[1:]:
             pygame.draw.rect(self.display, BLUE1, pygame.Rect(pt.x, pt.y, BLOCK_SIZE, BLOCK_SIZE))
             pygame.draw.rect(self.display, BLUE2, pygame.Rect(pt.x+4, pt.y+4, 12, 12))
             
