@@ -25,7 +25,7 @@ class Agent:
         self.memory = deque(maxlen=MAX_MEMORY)
         
         # Set model and trainer
-        self.model = Linear_QNet(11, 256, 128, 3)
+        self.model = Linear_QNet(14, 256, 128, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
@@ -42,10 +42,10 @@ class Agent:
         point_r = Point(head.x + 20, head.y)
         point_u = Point(head.x, head.y - 20)
         point_d = Point(head.x, head.y + 20)
-        point_ru = Point(head.x+ 20, head.y - 20)
-        point_lu = Point(head.x - 20, head.y - 20)
-        point_ld = Point(head.x - 20, head.y + 20)
-        point_rd = Point(head.x + 20, head.y + 20)
+        point_ll = Point(head.x - 40, head.y)
+        point_rr = Point(head.x + 40, head.y)
+        point_uu = Point(head.x, head.y - 40)
+        point_dd = Point(head.x, head.y + 40)
 
 
         # Get the direction we are moving towards (one-hot encoding like)

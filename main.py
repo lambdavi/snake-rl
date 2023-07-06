@@ -2,6 +2,7 @@ from helper import plot
 from agent import Agent
 from snake_game_ai import SnakeGameAI
 
+import random
 
 def train():
     """

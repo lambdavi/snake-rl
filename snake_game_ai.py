@@ -7,7 +7,6 @@ import pygame
 
 pygame.init()
 font = pygame.font.Font('arial.ttf', 25)
-
 class Direction(Enum):
     RIGHT = 1
     LEFT = 2
@@ -40,6 +39,7 @@ class SnakeGameAI:
         pygame.display.set_caption('Snake')
         self.clock = pygame.time.Clock()
         self.cycle = deque(maxlen=20)
+        self.frame_iteration = 0
         self.reset()
         
 
@@ -124,12 +124,12 @@ class SnakeGameAI:
             self.snake.pop()
 
             if final_distance < initial_distance:
-                reward += 0.1
+                reward = 0.1
             else:
-                reward += -0.1
+                reward = -0.1
 
             if self.check_for_cycles():
-                reward -= 2
+                reward = -1
         
         # 5. update ui and clock
         self._update_ui()
