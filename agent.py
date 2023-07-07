@@ -25,7 +25,7 @@ class Agent:
         self.memory = deque(maxlen=MAX_MEMORY)
         
         # Set model and trainer
-        self.model = Linear_QNet(14, 256, 128, 3)
+        self.model = Linear_QNet(11, 256, 128, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
 
